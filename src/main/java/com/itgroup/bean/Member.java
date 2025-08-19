@@ -102,16 +102,6 @@ public class Member {
 
     @Override
     public String toString() {
-        return "Member{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
-                ", gender='" + gender + '\'' +
-                ", birth='" + birth + '\'' +
-                ", marriage='" + marriage + '\'' +
-                ", salary=" + salary +
-                ", address='" + address + '\'' +
-                ", manager='" + manager + '\'' +
-                '}';
+        return "id : " + id + ", 이름 : " + name + ", 비밀번호 : " + password + ", 성별 : " + gender + ", 생일 : " + birth + ", 결혼여부 : " + marriage + ", 월급 : " + salary + ", 주소 : " + address + ", 관리자 : " + manager;
     }
 }
