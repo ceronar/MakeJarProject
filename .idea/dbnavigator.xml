@@ -6,7 +6,7 @@
   </component>
   <component name="DBNavigator.Project.DataEditorManager">
     <record-view-column-sorting-type value="BY_INDEX" />
-    <value-preview-text-wrapping value="true" />
+    <value-preview-text-wrapping value="false" />
     <value-preview-pinned value="false" />
   </component>
   <component name="DBNavigator.Project.DatabaseAssistantManager">
@@ -24,7 +24,7 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="c799c4c7-82ff-42b3-85c2-a93967c165dd">
-      <console name="Connection" type="STANDARD" schema="ORAMAN" session="Main"><![CDATA[select * from MEMBERS where id = 'yusin';]]></console>
+      <console name="Connection" type="STANDARD" schema="ORAMAN" session="Main"><![CDATA[select * from BOARDS order by REGDATE desc]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">

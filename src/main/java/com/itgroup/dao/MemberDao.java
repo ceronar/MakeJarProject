@@ -1,46 +1,34 @@
 package com.itgroup.dao;
 
 import com.itgroup.bean.Member;
-import oracle.jdbc.proxy.annotation.Pre;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 // 데이터 베이스와 직접 연동하여 CRUD 작업을 수행해주는 DAO 클래스
-public class MemberDao {
+public class MemberDao extends SuperDao {
     public MemberDao() {
-        // 드라이버 관련 OracleDriver 클래스는 ojdbc6.jar 파일에 포함되어 있는 자바 클래스
-        String driver = "oracle.jdbc.driver.OracleDriver";
-        try {
-            Class.forName(driver); // 동적 객체를 생성하는 문법
-        } catch (ClassNotFoundException e) {
-            System.out.println("해당 드라이브가 존재하지 않습니다.");
-            e.printStackTrace();
-        }
+        super();
     }
-    public Connection getConnection() {
-        Connection conn = null; // 접속 객체
-        String url = "jdbc:oracle:thin:@localhost:1521:xe";
-        String id = "oraman";
-        String pw = "oracle";
+
+    private Member makeBean(ResultSet rs) {
+        Member bean = null;
         try {
-            conn = DriverManager.getConnection(url, id, pw);
-            System.out.println("접속 성공");
+            bean = new Member();
+            bean.setId(rs.getString("id"));
+            bean.setName(rs.getString("name"));
+            bean.setPassword(rs.getString("password"));
+            bean.setGender(rs.getString("gender"));
+            bean.setBirth(String.valueOf(rs.getDate("birth")));
+            bean.setMarriage(rs.getString("marriage"));
+            bean.setSalary(rs.getInt("salary"));
+            bean.setAddress(rs.getString("address"));
+            bean.setManager(rs.getString("manager"));
         } catch (SQLException e) {
-            System.out.println("접속 실패");
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return conn;
-    }
-    public void close(ResultSet rs, PreparedStatement pstmt, Connection conn) {
-        try {
-            if (rs != null) rs.close();
-            if (pstmt != null) pstmt.close();
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return bean;
     }
 
     public int getSize() {
@@ -50,7 +38,7 @@ public class MemberDao {
         ResultSet rs = null;
         int cnt = 0; // 검색된 회원 수
         try {
-            conn = this.getConnection(); // 접속 객체 구하기
+            conn = super.getConnection(); // 접속 객체 구하기
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
             if(rs.next()) {
@@ -59,13 +47,7 @@ public class MemberDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (pstmt != null) pstmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            close(rs, pstmt, conn);
         }
         return cnt;
     }
@@ -77,29 +59,22 @@ public class MemberDao {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
-            conn = this.getConnection();
+            conn = super.getConnection();
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
             while (rs.next()) {
-                Member bean = new Member();
-                bean.setId(rs.getString("id"));
-                bean.setName(rs.getString("name"));
-                bean.setPassword(rs.getString("password"));
-                bean.setGender(rs.getString("gender"));
-                bean.setBirth(rs.getString("birth"));
-                bean.setMarriage(rs.getString("marriage"));
-                bean.setSalary(rs.getInt("salary"));
-                bean.setAddress(rs.getString("address"));
-                bean.setManager(rs.getString("manager"));
+                Member bean = this.makeBean(rs);
                 members.add(bean);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            this.close(rs, pstmt, conn);
+            super.close(rs, pstmt, conn);
         }
         return members;
     }
+
+
 
     public List<Member> findByGender(String gender) {
         // 성별 컬럼 GENDER를 사용하여 특정 성별의 회원들만 조회
@@ -109,27 +84,18 @@ public class MemberDao {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
-            conn = this.getConnection();
+            conn = super.getConnection();
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, gender);
             rs = pstmt.executeQuery();
             while (rs.next()) {
-                Member bean = new Member();
-                bean.setId(rs.getString("id"));
-                bean.setName(rs.getString("name"));
-                bean.setPassword(rs.getString("password"));
-                bean.setGender(rs.getString("gender"));
-                bean.setBirth(rs.getString("birth"));
-                bean.setMarriage(rs.getString("marriage"));
-                bean.setSalary(rs.getInt("salary"));
-                bean.setAddress(rs.getString("address"));
-                bean.setManager(rs.getString("manager"));
+                Member bean = this.makeBean(rs);
                 members.add(bean);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            this.close(rs, pstmt, conn);
+            super.close(rs, pstmt, conn);
         }
         return members;
     }
@@ -142,26 +108,17 @@ public class MemberDao {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
-            conn = this.getConnection();
+            conn = super.getConnection();
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, id);
             rs = pstmt.executeQuery();
             if (rs.next()) {
-                bean = new Member();
-                bean.setId(rs.getString("id"));
-                bean.setName(rs.getString("name"));
-                bean.setPassword(rs.getString("password"));
-                bean.setGender(rs.getString("gender"));
-                bean.setBirth(rs.getString("birth"));
-                bean.setMarriage(rs.getString("marriage"));
-                bean.setSalary(rs.getInt("salary"));
-                bean.setAddress(rs.getString("address"));
-                bean.setManager(rs.getString("manager"));
+                bean = this.makeBean(rs);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            this.close(rs, pstmt, conn);
+            super.close(rs, pstmt, conn);
         }
         return bean;
     }
@@ -172,7 +129,7 @@ public class MemberDao {
         PreparedStatement pstmt = null;
         Connection conn = null;
         try {
-            conn = this.getConnection();
+            conn = super.getConnection();
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, id);
             cnt = pstmt.executeUpdate();
@@ -185,7 +142,99 @@ public class MemberDao {
             }
            e.printStackTrace();
         } finally {
-            this.close(null, pstmt, conn);
+            super.close(null, pstmt, conn);
+        }
+        return cnt;
+    }
+
+    public int insertData(Member member) {
+        // 웹 페이지에서 회원 정보를 입력하고 '가입' 버튼을 누름
+        int cnt = -1;
+        String sql = "insert into members(id, name, password, gender, birth, marriage, salary, address, manager)";
+        sql += " values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = super.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, member.getId());
+            pstmt.setString(2, member.getName());
+            pstmt.setString(3, member.getPassword());
+            pstmt.setString(4, member.getGender());
+            pstmt.setString(5, member.getBirth());
+            pstmt.setString(6, member.getMarriage());
+            pstmt.setInt(7, member.getSalary());
+            pstmt.setString(8, member.getAddress());
+            pstmt.setString(9, member.getManager());
+            cnt = pstmt.executeUpdate();
+            conn.commit();
+        } catch (Exception e) {
+            try {
+                conn.rollback();
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+            e.printStackTrace();
+        } finally {
+            super.close(null, pstmt, conn);
+        }
+        return cnt;
+    }
+
+    public int updateData(Member bean) {
+        // 수정된 나의 정보 bean을 사용하여 데이터 베이스에 수정
+        int cnt = -1;
+
+        String sql ="update members set name = ?, password = ?, gender = ?, birth = ?, marriage = ?, salary = ?, address = ?, manager = ?";
+        sql += " where id = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = super.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, bean.getName());
+            pstmt.setString(2, bean.getPassword());
+            pstmt.setString(3, bean.getGender());
+            pstmt.setString(4, bean.getBirth());
+            pstmt.setString(5, bean.getMarriage());
+            pstmt.setInt(6, bean.getSalary());
+            pstmt.setString(7, bean.getAddress());
+            pstmt.setString(8, bean.getManager());
+            pstmt.setString(9, bean.getId());
+            cnt = pstmt.executeUpdate();
+            conn.commit();
+        } catch (Exception e) {
+            try {
+                conn.rollback();
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+            e.printStackTrace();
+        } finally {
+            super.close(null, pstmt, conn);
+        }
+
+        return cnt;
+    }
+
+    public int deleteAllData() {
+        int cnt = -1;
+        String sql = "delete from members";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = super.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            cnt = pstmt.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        } finally {
+            super.close(null, pstmt, conn);
         }
         return cnt;
     }
